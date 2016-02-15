@@ -5,23 +5,21 @@ public class Action {
 	    MOVING, EXPLORING, IDLE, ENCOUNTERED, FIGHTING, RUNNING 
 	}
 	
-	ActionType type;
-	//implement duration later
+	final ActionType type;
+	final int totalDurationInSecs; // how much time is required to complete the action from start to finish
+	int remainingDurationInSecs; // how much more time is needed to complete the action
 	
+	// extra data (usually that go with specific action types) that doesn't necessarily need to be populated
 	Structure dest = null;
-	
 	Group encountered = null;
 	
-	Action(ActionType type){
+	Action(ActionType type, int totalDurationInSecs){
 		this.type = type;
+		this.totalDurationInSecs = totalDurationInSecs;
 	}
 	
 	public ActionType getType() {
 		return type;
-	}
-
-	public void setType(ActionType type) {
-		this.type = type;
 	}
 
 	public Structure getDest() {
@@ -39,5 +37,16 @@ public class Action {
 	public void setEncountered(Group encountered) {
 		this.encountered = encountered;
 	}
+
+	public int getRemainingDurationInSecs() {
+		return remainingDurationInSecs;
+	}
 	
+	// post-condition: remainingDurationInSecs >= 0
+	public void reduceRemainingDurationInSecs(int amountInSecs) {
+		remainingDurationInSecs -= amountInSecs;
+		if (0 > remainingDurationInSecs) {
+			remainingDurationInSecs = 0;
+		}
+	}
 }

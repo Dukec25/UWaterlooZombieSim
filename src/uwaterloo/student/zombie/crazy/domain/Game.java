@@ -8,11 +8,15 @@ import java.util.Map;
 public class Game {
 	Map<String, Structure> structureMap; // map from the structure's name to the structure itself
 	
-	public static void main(String[] args){ 
+	public static void main(String[] args) throws IOException{ 
 		System.out.println("HELLO WORLD");
+		
+		Game game = new Game();
+		game.constructMap();
+		game.populateMap();
 	}
 	
-	public void constructMap(String[] args) throws IOException{
+	public void constructMap() throws IOException{
 		String mapFileName = ""; // TODO: figure out where to put this file
 		
 		FileReader input = new FileReader(mapFileName);
@@ -57,5 +61,9 @@ public class Game {
 			structureA.connectStructure(structureB);
 			structureB.connectStructure(structureA);
 		}
+	}
+	
+	public void populateMap() {
+		// TODO: implement!
 	}
 }
