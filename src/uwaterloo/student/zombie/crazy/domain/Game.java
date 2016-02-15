@@ -1,12 +1,12 @@
 package uwaterloo.student.zombie.crazy.domain;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 
 public class Game {
-	Structure node = null;  // arbitrary building in the map to keep the memory here
+	Map<String, Structure> structureMap; // map from the structure's name to the structure itself
 	
 	public static void main(String[] args){ 
 		System.out.println("HELLO WORLD");
@@ -19,9 +19,9 @@ public class Game {
 		BufferedReader bufRead = new BufferedReader(input);
 		String line = null;
 
+		// construct the nodes
 		line = bufRead.readLine();
 		int numOfStructures = Integer.parseInt(line);
-		
 		for (int i = 0; i < numOfStructures; ++i) {
 			line = bufRead.readLine();
 			
@@ -40,9 +40,22 @@ public class Game {
 						+ "Expected either 'B' or 'L' at the end of line!");
 			}
 			
-			if (null == node) {
-				node = newStructure;
-			}
+			structureMap.put(newStructure.name, newStructure);
+		}
+		
+		// link the nodes
+		
+		line = bufRead.readLine();
+		int numOfConnections = Integer.parseInt(line);		
+		for (int i = 0; i < numOfConnections; ++i) {
+			String[] lineItems = line.split(" ");
+			
+			Structure structureA, structureB;
+			structureA = structureMap.get(lineItems[0]);
+			structureB = structureMap.get(lineItems[1]);
+			
+			structureA.connectStructure(structureB);
+			structureB.connectStructure(structureA);
 		}
 	}
 }

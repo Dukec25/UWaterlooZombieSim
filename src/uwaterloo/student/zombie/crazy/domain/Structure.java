@@ -20,4 +20,8 @@ public abstract class Structure {
 			throw new RuntimeException("remove null existing group");
 		}
 	}
+	
+	public void connectStructure(Structure neighbourToBe) {
+		neighbours.add(neighbourToBe);
+	}
 }
