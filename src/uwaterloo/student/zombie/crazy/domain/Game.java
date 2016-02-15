@@ -1,4 +1,4 @@
-package uwaterloo.student.zombie.crazy.student;
+package uwaterloo.student.zombie.crazy.domain;
 
 public class Game {
 	public static void main(String[] args){
