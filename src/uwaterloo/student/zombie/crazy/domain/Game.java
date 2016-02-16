@@ -3,17 +3,33 @@ package uwaterloo.student.zombie.crazy.domain;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class Game {
 	Map<String, Structure> structureMap; // map from the structure's name to the structure itself
+	PriorityQueue<Sentient> sentientList = new PriorityQueue<Sentient>( 2 , new Comparator<Sentient>(){
+
+		@Override
+		public int compare(Sentient o1, Sentient o2) {
+			if(o1.getActionTime() < o2.getActionTime()){
+				return -1; 
+			}
+			else if(o1.getActionTime() > o2.getActionTime()){
+				return 1;
+			}
+			return 0;
+		}
+
+	});
 	
 	public static void main(String[] args) throws IOException{ 
 		System.out.println("HELLO WORLD");
 		
 		Game game = new Game();
 		game.constructMap();
-		game.populateMap();
+		game.populateMap(5,5);
 	}
 	
 	public void constructMap() throws IOException{
@@ -63,7 +79,20 @@ public class Game {
 		}
 	}
 	
-	public void populateMap() {
+	public void populateMap(int zombieNum, int humanNum) {
 		// TODO: implement!
+		// create initial creature and possibly group 
+	
+		for(int n = 0; n < zombieNum; n++){
+			Group temp = new Group();
+			temp.addMember(new Zombie());
+			sentientList.add(temp);
+		}
+		for(int n = 0; n < humanNum; n++){
+			Group temp = new Group();
+			temp.addMember(new Human());
+			sentientList.add(temp);
+		}
+		
 	}
 }
