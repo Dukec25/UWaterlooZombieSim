@@ -19,7 +19,7 @@ public class Group implements Sentient {
 	}
 	
 	@Override
-	public int getActionTime(){
+	public long getActionTime(){
 		return action.getRemainingDurationInSecs();
 	}
 	
