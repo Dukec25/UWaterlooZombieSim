@@ -4,17 +4,21 @@ import java.util.List;
 
 public abstract class Structure {
 	int size; 
-	String name; 
-	List<Group> groups;
+	String name;
+	List<Sentient> sentients;
 	List<Structure> neighbours; 
 	
-	public void addGroup(Group group){
-		groups.add(group);
+	public List<Sentient> getSentients() {
+		return sentients;
+	}
+
+	public void addSentient(Sentient sentient){
+		sentients.add(sentient);
 	}
 	
-	public void removeGroup(Group group){
-		if(groups.contains(group)){
-			groups.remove(group);
+	public void removeSentient(Sentient sentient){
+		if(sentients.contains(sentient)){
+			sentients.remove(sentient);
 		}
 		else{
 			throw new RuntimeException("remove null existing group");

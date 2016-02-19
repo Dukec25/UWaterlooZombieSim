@@ -29,10 +29,10 @@ public class Game {
 	
 	private void run(){
 		while(true){
-			long timeToElapse = gameParticipants.peek().getAction().getRemainingDurationInSecs();
-			
-			advanceStateForTime(timeToElapse);
+			// every time this loop iterates, we simulate 60 seconds (1 min) of game time
+			advanceStateForTime(60);
 			makeDecisions();
+			generateEvents();
 		}
 	}
 	
@@ -47,6 +47,38 @@ public class Game {
 		// update remaining times (TODO: maybe do this while updating state?)
 		for (Sentient participant : gameParticipants) {
 			participant.getAction().reduceRemainingDurationInSecs(timeInSecs);
+		}
+	}
+	
+	/**
+	 * look at the current state of the world and determine whether certain events should take place,
+	 * thus changing the state
+	 */
+	private void generateEvents() {
+		// for each structure, determine whether groups in the structure encounter each other
+		for (Structure structure : structureMap.values()) {
+			// loop over each pair of Sentients in structure (s_i, s_j), where i < j
+			for (int i = 0; i < structure.getSentients().size() - 1; ++i) {
+				for (int j = i + 1; j < structure.getSentients().size(); ++j) {
+					Sentient sentientI, sentientJ;
+					sentientI = structure.getSentients().get(i);
+					sentientJ = structure.getSentients().get(j);
+					
+					if (GameUtil.chancePercentage(sentientI.getEncounterProbabiltyWith(sentientJ))) {
+						// update sentientI's state
+						if (sentientI.getAction().getType() != Action.ActionType.ENCOUNTERED) {
+							sentientI.setAction(new Action(Action.ActionType.ENCOUNTERED, Action.ENCOUNTER_DURATION_IN_SECS));
+						}
+						sentientI.getAction().getEncounteredSentients().add(sentientJ);
+						
+						// update sentientJ's state
+						if (sentientJ.getAction().getType() != Action.ActionType.ENCOUNTERED) {
+							sentientJ.setAction(new Action(Action.ActionType.ENCOUNTERED, Action.ENCOUNTER_DURATION_IN_SECS));
+						}
+						sentientJ.getAction().getEncounteredSentients().add(sentientI);
+					}
+				}
+			} // end of: loop over each pair of Sentients in structure (s_i, s_j), where i < j
 		}
 	}
 	

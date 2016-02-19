@@ -1,5 +1,8 @@
 package uwaterloo.student.zombie.crazy.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Action {
 	public enum ActionType {
 	    MOVING, EXPLORING, IDLE, ENCOUNTERED, FIGHTING, RUNNING 
@@ -11,7 +14,10 @@ public class Action {
 	
 	// extra data (usually that go with specific action types) that doesn't necessarily need to be populated
 	Structure dest = null;
-	Group encountered = null;
+	List<Sentient> encounteredSentients = new ArrayList<Sentient>();
+	
+	// constants:
+	public static final int ENCOUNTER_DURATION_IN_SECS = 60;
 	
 	Action(ActionType type, long totalDurationInSecs){
 		this.type = type;
@@ -30,12 +36,12 @@ public class Action {
 		this.dest = dest;
 	}
 
-	public Group getEncountered() {
-		return encountered;
+	public List<Sentient> getEncounteredSentients() {
+		return encounteredSentients;
 	}
 
-	public void setEncountered(Group encountered) {
-		this.encountered = encountered;
+	public void setEncounteredSentients(List<Sentient> encounteredSentients) {
+		this.encounteredSentients = encounteredSentients;
 	}
 
 	public long getRemainingDurationInSecs() {

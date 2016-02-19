@@ -14,4 +14,14 @@ public interface Sentient {
 	void makeDecision();
 	
 	Action getAction();
+	
+	void setAction(Action action);
+	
+	/**
+	 * get the probability (in percentage per min) that this Sentient encounters the other;
+	 * Property; a.getEncounterProbabiltyWith(b) = b.getEncounterProbabiltyWith(a)
+	 * @param other the Sentient to encounter
+	 * @return the probability (in percentage per min) that this Sentient encounters the other
+	 */
+	float getEncounterProbabiltyWith(Sentient other);
 }
