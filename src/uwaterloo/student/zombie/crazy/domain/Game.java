@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
 
 public class Game {
 	Map<String, Structure> structureMap; // map from the structure's name to the structure itself
-	List<Group> gameParticipants;
+	List<Group> gameParticipants; 
 	PriorityQueue<Sentient> sentientList = new PriorityQueue<Sentient>( 2 , new Comparator<Sentient>(){
 
 		@Override
@@ -51,10 +51,17 @@ public class Game {
 		}
 	}
 	
+	// go through the Sentient list, find the one has time remaining zero and do the decision
+	// does not advance time 
 	private void makeDecisions() {
+		if(sentientList.isEmpty()){
+			return;
+		}
+		
 		while (0 == sentientList.peek().getActionTime()) {
-			//sentientList.poll();
-			// TODO: implement!
+			Sentient temp = sentientList.poll();
+			temp.makeDecision();
+			sentientList.add(temp);
 		}
 	}
 	
@@ -125,7 +132,7 @@ public class Game {
 			sentientList.add(temp);
 		}
 		
-		// TODO: put things somewhere in the map
+		
 	}
 	
 	public static void main(String[] args) throws IOException{ 
