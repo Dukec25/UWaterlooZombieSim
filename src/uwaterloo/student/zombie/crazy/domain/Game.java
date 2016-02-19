@@ -3,14 +3,16 @@ package uwaterloo.student.zombie.crazy.domain;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Game {
-	Map<String, Structure> structureMap; // map from the structure's name to the structure itself
-	List<Building> buildingList;
+	Map<String, Structure> structureMap = new HashMap<String, Structure>(); // map from the structure's name to the structure itself
+	List<Building> buildingList = new ArrayList<Building>();
 	PriorityQueue<Sentient> gameParticipants = new PriorityQueue<Sentient>( 2 , new Comparator<Sentient>(){
 
 		@Override
@@ -49,6 +51,11 @@ public class Game {
 		for (Sentient participant : gameParticipants) {
 			participant.getAction().reduceRemainingDurationInSecs(timeInSecs);
 		}
+		
+		this.timeInSecs+= timeInSecs;
+		
+		// for testing
+		System.out.println("game time is now: " + this.timeInSecs);
 	}
 	
 	/**
@@ -98,7 +105,7 @@ public class Game {
 	}
 	
 	private void constructMap() throws IOException{
-		String mapFileName = ""; // TODO: figure out where to put this file
+		String mapFileName = "res/UW_Map.txt"; // TODO: figure out where to put this file
 		
 		FileReader input = new FileReader(mapFileName);
 		BufferedReader bufRead = new BufferedReader(input);
@@ -117,9 +124,9 @@ public class Game {
 				}
 				
 				Structure newStructure = null;
-				if (lineItems[2] == "B") {
+				if (0 == lineItems[2].compareTo(new String("B"))) {
 					newStructure = new Building(Integer.parseInt(lineItems[1]), lineItems[0]);
-				} else if (lineItems[2] == "L") {
+				} else if (0 == lineItems[2].compareTo(new String("L"))) {
 					newStructure = new Link(Integer.parseInt(lineItems[1]), lineItems[0]);
 				} else {
 					throw new RuntimeException("Incorrect format for structure line! "
@@ -134,10 +141,10 @@ public class Game {
 			}
 			
 			// link the nodes
-			
 			line = bufRead.readLine();
 			int numOfConnections = Integer.parseInt(line);		
 			for (int i = 0; i < numOfConnections; ++i) {
+				line = bufRead.readLine();
 				String[] lineItems = line.split(" ");
 				
 				Structure structureA, structureB;
@@ -152,22 +159,24 @@ public class Game {
 		}
 	}
 	
-	private void populateMap(int zombieNum, int humanNum) {
+	public void populateMap(int zombieNum, int humanNum) {
 		// create initial creature and possibly group 	
 		for(int n = 0; n < zombieNum; n++){
 			Group temp = new Group();
 			temp.addMember(new Zombie());
+			temp.setAction(new Action(Action.ActionType.IDLE, 60)); // TODO: don't hardcode this later
 			gameParticipants.add(temp);
 		}
 		for(int n = 0; n < humanNum; n++){
 			Group temp = new Group();
 			temp.addMember(new Human());
+			temp.setAction(new Action(Action.ActionType.IDLE, 60)); // TODO: don't hardcode this later
 			gameParticipants.add(temp);
 		}
 		
 		placeParticipants();
 	}
-	
+		
 	/**
 	 * put gameParticipants in randomized locations
 	 */

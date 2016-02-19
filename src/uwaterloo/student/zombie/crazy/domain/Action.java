@@ -22,6 +22,7 @@ public class Action {
 	Action(ActionType type, long totalDurationInSecs){
 		this.type = type;
 		this.totalDurationInSecs = totalDurationInSecs;
+		this.remainingDurationInSecs = totalDurationInSecs;
 	}
 	
 	public ActionType getType() {

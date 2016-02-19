@@ -7,7 +7,7 @@ public class Group implements Sentient {
 	private static final float ENCOUNTER_PROB = (float) 1.0; // in percentage per minute
 	
 	Action action;
-	ArrayList<Creature> members; 
+	ArrayList<Creature> members = new ArrayList<Creature>(); 
 	Structure location;
 	
 	public void addMember(Creature creature){
