@@ -21,4 +21,13 @@ public class GameUtil {
 			return true;
 		}
 	}
+	
+	/**
+	 * a wrapper around the Java.util.Random.nextInt function
+	 * @param bound
+	 * @return
+	 */
+	public static int nextInt(int bound) {
+		return randomGenerator.nextInt(bound);
+	}
 }

@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 
 public class Game {
 	Map<String, Structure> structureMap; // map from the structure's name to the structure itself
+	List<Building> buildingList;
 	PriorityQueue<Sentient> gameParticipants = new PriorityQueue<Sentient>( 2 , new Comparator<Sentient>(){
 
 		@Override
@@ -126,6 +127,9 @@ public class Game {
 				}
 				
 				structureMap.put(newStructure.name, newStructure);
+				if (newStructure instanceof Building) {
+					buildingList.add((Building)newStructure);
+				}
 			
 			}
 			
@@ -161,7 +165,26 @@ public class Game {
 			gameParticipants.add(temp);
 		}
 		
+		placeParticipants();
+	}
+	
+	/**
+	 * put gameParticipants in randomized locations
+	 */
+	private void placeParticipants() {
+		// for testing
+		int gameParticipantsSize = gameParticipants.size();
 		
+		int numOfBuildings = buildingList.size();
+		for (Sentient participant : gameParticipants) {
+			Structure targetBuilding = buildingList.get(GameUtil.nextInt(numOfBuildings));
+			
+			participant.setLocation(targetBuilding);
+			targetBuilding.addSentient(participant);
+		}
+		
+		// for testing
+		assert(gameParticipantsSize == gameParticipants.size());
 	}
 	
 	public static void main(String[] args) throws IOException{ 

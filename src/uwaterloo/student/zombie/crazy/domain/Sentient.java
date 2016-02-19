@@ -2,6 +2,7 @@ package uwaterloo.student.zombie.crazy.domain;
 
 /**
  * represents objects that are capable of action and decision making (changing actions)
+ * and also has a location state
  * this is useful when you want to determine when and how to change the state of an object
  * @author Difei & Duke
  *
@@ -16,6 +17,10 @@ public interface Sentient {
 	Action getAction();
 	
 	void setAction(Action action);
+	
+	Structure getLocation();
+	
+	void setLocation(Structure location);
 	
 	/**
 	 * get the probability (in percentage per min) that this Sentient encounters the other;

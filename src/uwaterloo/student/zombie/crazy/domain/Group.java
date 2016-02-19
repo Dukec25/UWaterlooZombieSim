@@ -44,6 +44,16 @@ public class Group implements Sentient {
 	@Override
 	public void setAction(Action action) {
 		this.action = action;
+	}
+
+	@Override
+	public Structure getLocation() {
+		return location;
+	}
+
+	@Override
+	public void setLocation(Structure location) {
+		this.location = location;
 	} 
 	
 }
