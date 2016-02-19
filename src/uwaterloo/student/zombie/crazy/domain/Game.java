@@ -10,15 +10,14 @@ import java.util.PriorityQueue;
 
 public class Game {
 	Map<String, Structure> structureMap; // map from the structure's name to the structure itself
-	List<Group> gameParticipants; 
-	PriorityQueue<Sentient> sentientList = new PriorityQueue<Sentient>( 2 , new Comparator<Sentient>(){
+	PriorityQueue<Sentient> gameParticipants = new PriorityQueue<Sentient>( 2 , new Comparator<Sentient>(){
 
 		@Override
 		public int compare(Sentient o1, Sentient o2) {
-			if(o1.getActionTime() < o2.getActionTime()){
+			if(o1.getAction().getRemainingDurationInSecs() < o2.getAction().getRemainingDurationInSecs()){
 				return -1; 
 			}
-			else if(o1.getActionTime() > o2.getActionTime()){
+			else if(o1.getAction().getRemainingDurationInSecs() > o2.getAction().getRemainingDurationInSecs()){
 				return 1;
 			}
 			return 0;
@@ -30,7 +29,7 @@ public class Game {
 	
 	private void run(){
 		while(true){
-			long timeToElapse = sentientList.peek().getActionTime();
+			long timeToElapse = gameParticipants.peek().getAction().getRemainingDurationInSecs();
 			
 			advanceStateForTime(timeToElapse);
 			makeDecisions();
@@ -46,22 +45,22 @@ public class Game {
 		// TODO: implement!
 		
 		// update remaining times (TODO: maybe do this while updating state?)
-		for (Group group : gameParticipants) {
-			group.action.reduceRemainingDurationInSecs(timeInSecs);
+		for (Sentient participant : gameParticipants) {
+			participant.getAction().reduceRemainingDurationInSecs(timeInSecs);
 		}
 	}
 	
 	// go through the Sentient list, find the one has time remaining zero and do the decision
 	// does not advance time 
 	private void makeDecisions() {
-		if(sentientList.isEmpty()){
+		if(gameParticipants.isEmpty()){
 			return;
 		}
 		
-		while (0 == sentientList.peek().getActionTime()) {
-			Sentient temp = sentientList.poll();
+		while (0 == gameParticipants.peek().getAction().getRemainingDurationInSecs()) {
+			Sentient temp = gameParticipants.poll();
 			temp.makeDecision();
-			sentientList.add(temp);
+			gameParticipants.add(temp);
 		}
 	}
 	
@@ -123,13 +122,11 @@ public class Game {
 			Group temp = new Group();
 			temp.addMember(new Zombie());
 			gameParticipants.add(temp);
-			sentientList.add(temp);
 		}
 		for(int n = 0; n < humanNum; n++){
 			Group temp = new Group();
 			temp.addMember(new Human());
 			gameParticipants.add(temp);
-			sentientList.add(temp);
 		}
 		
 		

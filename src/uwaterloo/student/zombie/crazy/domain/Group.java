@@ -18,11 +18,6 @@ public class Group implements Sentient {
 		
 	}
 	
-	@Override
-	public long getActionTime(){
-		return action.getRemainingDurationInSecs();
-	}
-	
 	public void removeMember(Creature creature){
 		members.remove(creature);
 	}
@@ -31,6 +26,11 @@ public class Group implements Sentient {
 	public void makeDecision() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Action getAction() {
+		return action;
 	} 
 	
 	
