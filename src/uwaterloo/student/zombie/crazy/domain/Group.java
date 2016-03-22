@@ -54,6 +54,18 @@ public class Group implements Sentient {
 	@Override
 	public void setLocation(Structure location) {
 		this.location = location;
-	} 
+	}
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void advanceStateForTime(int secs) {
+        // TODO Auto-generated method stub
+        
+    } 
 	
 }

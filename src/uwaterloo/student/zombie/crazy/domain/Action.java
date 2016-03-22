@@ -5,7 +5,12 @@ import java.util.List;
 
 public class Action {
 	public enum ActionType {
-	    MOVING, EXPLORING, IDLE, ENCOUNTERED, FIGHTING, RUNNING 
+	    MOVING, // moving to a new location
+	    EXPLORING, // exploring current location
+	    IDLE,
+	    ENCOUNTERED,
+	    FIGHTING,
+	    RUNNING 
 	}
 	
 	final ActionType type;
