@@ -33,11 +33,10 @@ public class Game {
 
     private void run() {
         while (true) {
+            makeDecisions();
             // every time this loop iterates, we simulate 60 seconds (1 min) of
             // game time
             advanceStateForTime(60);
-            makeDecisions();
-            generateEvents();
         }
     }
 
@@ -61,6 +60,8 @@ public class Game {
 
         // for testing
         System.out.println("game time is now: " + this.timeInSecs);
+        
+        generateEvents();
     }
 
     /**
