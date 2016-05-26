@@ -33,7 +33,6 @@ public class Game {
 
     private void run() {
         while (true) {
-            makeDecisions();
             // every time this loop iterates, we simulate 60 seconds (1 min) of
             // game time
             advanceStateForTime(60);
@@ -42,16 +41,21 @@ public class Game {
 
     /**
      * Update the state of all groups/creatures/entities in the game for a
-     * specified amount of time. This includes updating the remaining times on
-     * all sentient beings' actions
+     * specified amount of time. This sentients make decisions and events
+     * are generated in carrying out this function.
+     * 
+     * The following order is followed in one execution of the function:
+     * 1) sentients make decisions
+     * 2) game state progresses
+     * 3) events are generated
      * 
      * @param timeInSecs
      *            time to advance the state, in seconds
      */
     private void advanceStateForTime(long timeInSecs) {
-        // TODO: implement!
-
-        // update remaining times (TODO: maybe do this while updating state?)
+        makeDecisions();
+        
+        // update remaining times (TODO: implement how to update state!)
         for (Sentient participant : gameParticipants) {
             participant.getAction().reduceRemainingDurationInSecs(timeInSecs);
         }
@@ -66,7 +70,7 @@ public class Game {
 
     /**
      * look at the current state of the world and determine whether certain
-     * events should take place, thus changing the state
+     * events should take place, thus changing the world state
      */
     private void generateEvents() {
         // =====================================================================================
@@ -103,8 +107,10 @@ public class Game {
         // =====================================================================================
     }
 
-    // go through the Sentient list, find the one has time remaining equal to zero and let them make decisions
-    // does not advance time
+    /**
+     *  go through the Sentient list, find the one has time remaining equal to zero and let them make decisions
+     *  Does not advance time.
+     */
     private void makeDecisions() {
         if (gameParticipants.isEmpty()) {
             return;

@@ -5,6 +5,12 @@ import java.util.Random;
 public class GameUtil {
 	private static Random randomGenerator = new Random();
 	
+	/**
+	 * a random function that returns true or false based on the 
+	 * probability given (in percents).
+	 * @param n
+	 * @return
+	 */
 	public static boolean chancePercentage(int n){
 		return chancePercentage((float)n);
 	}

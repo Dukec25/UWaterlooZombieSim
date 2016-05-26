@@ -18,6 +18,10 @@ public interface Sentient {
 
     Action getAction();
 
+    /**
+     * force an action onto the Sentient. You can use this to implement "events".
+     * @param action
+     */
     void setAction(Action action);
 
     Structure getLocation();
