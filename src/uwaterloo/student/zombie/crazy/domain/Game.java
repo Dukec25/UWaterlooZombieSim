@@ -11,6 +11,29 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Game {
+
+    /////////////////////////////////////////////////////////
+    // Game level constants
+
+    // game state (updating) constants
+    final int UPDATE_STEP_SIZE_SEC = 60; // how much game time each
+                                         // update will advance for
+    final long UPDATE_STEP_SIZE_NS = UPDATE_STEP_SIZE_SEC * 1000000000;
+
+    // rendering constants
+    final int TARGET_FPS = 60;
+    final int MAX_UPDATES_PER_RENDER = 10; // keeps us from rendering very
+                        // infrequently if game state takes super long to update
+    //final long TARGET_NS_BETWEEN_FRAMES = 1000000000 / TARGET_FPS; // TODO: do we need this?
+
+    /////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////
+    // Game level variables
+    int timeInSecs = 0; // how much game time has elapsed since the start of the game
+
+    boolean isRunning = false;
+
     // map of structure names to the structure for all structures in map
     Map<String, Structure> structureMap = new HashMap<String, Structure>();
 
@@ -29,32 +52,75 @@ public class Game {
 
     });
 
-    int timeInSecs = 0; // how much time has elapsed since the start of the game
+    /////////////////////////////////////////////////////////
 
-    private void run() {
-        while (true) {
-            // every time this loop iterates, we simulate 60 seconds (1 min) of
-            // game time
-            advanceStateForTime(60);
+    private void runGame() {
+        Thread gameLoopThread = new Thread() {
+            @Override
+            public void run() {
+                startGameLoop();
+            }
+        };
+        gameLoopThread.start();
+    }
+
+    private void startGameLoop() {
+        long lastUpdateTime = System.nanoTime(); // real time we last ran loop
+        long timeToUpdate = 0L;
+
+        isRunning = true;
+
+        while (isRunning) {
+            // step 1: deal with user input
+            processUserInput();
+
+            // step 2: update game state
+            long currTime = System.nanoTime();
+            timeToUpdate += lastUpdateTime - currTime;
+            lastUpdateTime = currTime;
+
+            int updateCount = 0;
+            while (timeToUpdate >= UPDATE_STEP_SIZE_NS
+                    && updateCount < MAX_UPDATES_PER_RENDER) {
+                advanceStateForTime(UPDATE_STEP_SIZE_SEC);
+                timeToUpdate -= UPDATE_STEP_SIZE_NS;
+                ++updateCount;
+            }
+
+            // if we still have a sizable amount of time that we need to update
+            // the state for, just give it up (the game will appear to lag)
+            if (timeToUpdate >= UPDATE_STEP_SIZE_NS) {
+                timeToUpdate = 0L;
+            }
+
+            // TODO: make thread yield to save CPU?
+
+            // step 3: update UI
+            updateUI();
         }
+    }
+
+    private void processUserInput() {
+        // TODO Auto-generated method stub
+
     }
 
     /**
      * Update the state of all groups/creatures/entities in the game for a
      * specified amount of time. This sentients make decisions and events
      * are generated in carrying out this function.
-     * 
+     *
      * The following order is followed in one execution of the function:
      * 1) sentients make decisions
      * 2) game state progresses
      * 3) events are generated
-     * 
+     *
      * @param timeInSecs
      *            time to advance the state, in seconds
      */
     private void advanceStateForTime(long timeInSecs) {
         makeDecisions();
-        
+
         // update remaining times (TODO: implement how to update state!)
         for (Sentient participant : gameParticipants) {
             participant.getAction().reduceRemainingDurationInSecs(timeInSecs);
@@ -64,8 +130,13 @@ public class Game {
 
         // for testing
         System.out.println("game time is now: " + this.timeInSecs);
-        
+
         generateEvents();
+    }
+
+    private void updateUI() {
+        // TODO Auto-generated method stub
+
     }
 
     /**
@@ -235,6 +306,6 @@ public class Game {
         Game game = new Game();
         game.constructMap();
         game.populateMap(5, 5);
-        game.run();
+        game.runGame();
     }
 }
