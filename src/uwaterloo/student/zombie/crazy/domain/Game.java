@@ -11,26 +11,20 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Game {
-
     /////////////////////////////////////////////////////////
     // Game level constants
-
-    // game state (updating) constants
     final int UPDATE_STEP_SIZE_SEC = 60; // how much game time each
                                          // update will advance for
     final long UPDATE_STEP_SIZE_NS = UPDATE_STEP_SIZE_SEC * 1000000000;
 
-    // rendering constants
-    final int TARGET_FPS = 60;
-    final int MAX_UPDATES_PER_RENDER = 10; // keeps us from rendering very
-                        // infrequently if game state takes super long to update
-    //final long TARGET_NS_BETWEEN_FRAMES = 1000000000 / TARGET_FPS; // TODO: do we need this?
-
-    /////////////////////////////////////////////////////////
-
     /////////////////////////////////////////////////////////
     // Game level variables
+    final SpeedConfig gameSpeed;
     int timeInSecs = 0; // how much game time has elapsed since the start of the game
+
+    boolean yieldingMode = true; // whether we yield the CPU (thus consuming less
+        // power) when we are running sufficiently fast. Try turning this off if
+        // you find the game lagging horribly
 
     boolean isRunning = false;
 
@@ -54,6 +48,10 @@ public class Game {
 
     /////////////////////////////////////////////////////////
 
+    Game() {
+        gameSpeed = new SpeedConfig(60, 120.0);
+    }
+
     private void runGame() {
         Thread gameLoopThread = new Thread() {
             @Override
@@ -65,8 +63,10 @@ public class Game {
     }
 
     private void startGameLoop() {
-        long lastUpdateTime = System.nanoTime(); // real time we last ran loop
-        long timeToUpdate = 0L;
+        long lastUpdateTime = System.nanoTime(); // the last (real) time we
+                                        // updated the game state
+        long lastRenderTime = lastUpdateTime;
+        long gameTimeToUpdate = 0L;
 
         isRunning = true;
 
@@ -76,27 +76,41 @@ public class Game {
 
             // step 2: update game state
             long currTime = System.nanoTime();
-            timeToUpdate += lastUpdateTime - currTime;
+            gameTimeToUpdate += (lastUpdateTime - currTime) * gameSpeed.gameSpeedRatio;
+            long targetRenderTime = lastRenderTime + gameSpeed.nsBetweenFrames;
+
+            while (gameTimeToUpdate >= UPDATE_STEP_SIZE_NS && currTime <= targetRenderTime) {
+                updateStateOneStep();
+                gameTimeToUpdate -= UPDATE_STEP_SIZE_NS;
+                currTime = System.nanoTime();
+            }
             lastUpdateTime = currTime;
 
-            int updateCount = 0;
-            while (timeToUpdate >= UPDATE_STEP_SIZE_NS
-                    && updateCount < MAX_UPDATES_PER_RENDER) {
-                advanceStateForTime(UPDATE_STEP_SIZE_SEC);
-                timeToUpdate -= UPDATE_STEP_SIZE_NS;
-                ++updateCount;
-            }
-
             // if we still have a sizable amount of time that we need to update
-            // the state for, just give it up (the game will appear to lag)
-            if (timeToUpdate >= UPDATE_STEP_SIZE_NS) {
-                timeToUpdate = 0L;
+            // the state for, just give it up (the game will slow down)
+            if (gameTimeToUpdate >= UPDATE_STEP_SIZE_NS) {
+                gameTimeToUpdate = 0L;
             }
 
-            // TODO: make thread yield to save CPU?
+            // step 3: if we're going really fast, wait a little to not burn the CPU!
+            if (yieldingMode){
+                while (currTime < targetRenderTime)
+                {
+                   Thread.yield();
 
-            // step 3: update UI
+                   // (from http://www.java-gaming.org/index.php?topic=24220.0)
+                   //This stops the app from consuming all your CPU. It makes this slightly less accurate, but is worth it.
+                   //You can remove this line and it will still work (better), your CPU just climbs on certain OSes.
+                   //FYI on some OS's this can cause pretty bad stuttering. Scroll down and have a look at different peoples' solutions to this.
+                   try {Thread.sleep(1);} catch(Exception e) {}
+
+                   currTime = System.nanoTime();
+                }
+            }
+
+            // step 4: update UI (render)
             updateUI();
+            lastRenderTime = System.nanoTime();
         }
     }
 
@@ -106,27 +120,23 @@ public class Game {
     }
 
     /**
-     * Update the state of all groups/creatures/entities in the game for a
-     * specified amount of time. This sentients make decisions and events
-     * are generated in carrying out this function.
+     * Update the state of the game for one step.
      *
-     * The following order is followed in one execution of the function:
+     * The following happens (in order):
      * 1) sentients make decisions
      * 2) game state progresses
      * 3) events are generated
      *
-     * @param timeInSecs
-     *            time to advance the state, in seconds
      */
-    private void advanceStateForTime(long timeInSecs) {
+    private void updateStateOneStep() {
         makeDecisions();
 
         // update remaining times (TODO: implement how to update state!)
         for (Sentient participant : gameParticipants) {
-            participant.getAction().reduceRemainingDurationInSecs(timeInSecs);
+            participant.getAction().reduceRemainingDurationInSecs(UPDATE_STEP_SIZE_SEC);
         }
 
-        this.timeInSecs += timeInSecs;
+        this.timeInSecs += UPDATE_STEP_SIZE_SEC;
 
         // for testing
         System.out.println("game time is now: " + this.timeInSecs);
@@ -308,4 +318,41 @@ public class Game {
         game.populateMap(5, 5);
         game.runGame();
     }
+
+    /**
+     * Stores data on how fast the game is running and some other timing
+     * configuration
+     *
+     * Only use the methods to edit your speed configuration, but you may access
+     * configuration values by evaluating the variables directly.
+     */
+    class SpeedConfig {
+        int targetFPS;
+        long nsBetweenFrames;
+
+        /**
+         * Ratio of game time to update vs. real time passed; defines game speed
+         * e.g. a ratio of 10.0 means the game time should advance 10 minutes
+         * every minute (the game is 10 times as fast as real life)
+         *
+         * Note that this game speed may not be met if your machine is slow...
+         */
+        double gameSpeedRatio;
+
+        SpeedConfig(int targetFPS, double gameSpeedRatio) {
+            setTargetFPS(targetFPS);
+            setGameSpeedRatio(gameSpeedRatio);
+        }
+
+        public void setTargetFPS(int targetFPS) {
+            this.targetFPS = targetFPS;
+            nsBetweenFrames = 1000000000 / targetFPS;
+        }
+
+        public void setGameSpeedRatio(double gameSpeedRatio) {
+            this.gameSpeedRatio = gameSpeedRatio;
+        }
+
+    }
+
 }
