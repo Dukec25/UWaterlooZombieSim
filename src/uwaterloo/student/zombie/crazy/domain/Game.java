@@ -11,6 +11,23 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Game {
+    /////////////////////////////////////////////////////////
+    // Game level constants
+    final int UPDATE_STEP_SIZE_SEC = 60; // how much game time each
+                                         // update will advance for
+    final long UPDATE_STEP_SIZE_NS = UPDATE_STEP_SIZE_SEC * 1000000000;
+
+    /////////////////////////////////////////////////////////
+    // Game level variables
+    final SpeedConfig gameSpeed;
+    int timeInSecs = 0; // how much game time has elapsed since the start of the game
+
+    boolean yieldingMode = true; // whether we yield the CPU (thus consuming less
+        // power) when we are running sufficiently fast. Try turning this off if
+        // you find the game lagging horribly
+
+    boolean isRunning = false;
+
     // map of structure names to the structure for all structures in map
     Map<String, Structure> structureMap = new HashMap<String, Structure>();
 
@@ -29,43 +46,112 @@ public class Game {
 
     });
 
-    int timeInSecs = 0; // how much time has elapsed since the start of the game
+    /////////////////////////////////////////////////////////
 
-    private void run() {
-        while (true) {
-            // every time this loop iterates, we simulate 60 seconds (1 min) of
-            // game time
-            advanceStateForTime(60);
-            makeDecisions();
-            generateEvents();
+    Game() {
+        gameSpeed = new SpeedConfig(60, 120.0);
+    }
+
+    private void runGame() {
+        Thread gameLoopThread = new Thread() {
+            @Override
+            public void run() {
+                startGameLoop();
+            }
+        };
+        gameLoopThread.start();
+    }
+
+    private void startGameLoop() {
+        long lastUpdateTime = System.nanoTime(); // the last (real) time we
+                                        // updated the game state
+        long lastRenderTime = lastUpdateTime;
+        long gameTimeToUpdate = 0L;
+
+        isRunning = true;
+
+        while (isRunning) {
+            // step 1: deal with user input
+            processUserInput();
+
+            // step 2: update game state
+            long currTime = System.nanoTime();
+            gameTimeToUpdate += (lastUpdateTime - currTime) * gameSpeed.gameSpeedRatio;
+            long targetRenderTime = lastRenderTime + gameSpeed.nsBetweenFrames;
+
+            while (gameTimeToUpdate >= UPDATE_STEP_SIZE_NS && currTime <= targetRenderTime) {
+                updateStateOneStep();
+                gameTimeToUpdate -= UPDATE_STEP_SIZE_NS;
+                currTime = System.nanoTime();
+            }
+            lastUpdateTime = currTime;
+
+            // if we still have a sizable amount of time that we need to update
+            // the state for, just give it up (the game will slow down)
+            if (gameTimeToUpdate >= UPDATE_STEP_SIZE_NS) {
+                gameTimeToUpdate = 0L;
+            }
+
+            // step 3: if we're going really fast, wait a little to not burn the CPU!
+            if (yieldingMode){
+                while (currTime < targetRenderTime)
+                {
+                   Thread.yield();
+
+                   // (from http://www.java-gaming.org/index.php?topic=24220.0)
+                   //This stops the app from consuming all your CPU. It makes this slightly less accurate, but is worth it.
+                   //You can remove this line and it will still work (better), your CPU just climbs on certain OSes.
+                   //FYI on some OS's this can cause pretty bad stuttering. Scroll down and have a look at different peoples' solutions to this.
+                   try {Thread.sleep(1);} catch(Exception e) {}
+
+                   currTime = System.nanoTime();
+                }
+            }
+
+            // step 4: update UI (render)
+            updateUI();
+            lastRenderTime = System.nanoTime();
         }
     }
 
-    /**
-     * Update the state of all groups/creatures/entities in the game for a
-     * specified amount of time. This includes updating the remaining times on
-     * all sentient beings' actions
-     * 
-     * @param timeInSecs
-     *            time to advance the state, in seconds
-     */
-    private void advanceStateForTime(long timeInSecs) {
-        // TODO: implement!
+    private void processUserInput() {
+        // TODO Auto-generated method stub
 
-        // update remaining times (TODO: maybe do this while updating state?)
+    }
+
+    /**
+     * Update the state of the game for one step.
+     *
+     * The following happens (in order):
+     * 1) sentients make decisions
+     * 2) game state progresses
+     * 3) events are generated
+     *
+     */
+    private void updateStateOneStep() {
+        makeDecisions();
+
+        // update remaining times (TODO: implement how to update state!)
         for (Sentient participant : gameParticipants) {
-            participant.getAction().reduceRemainingDurationInSecs(timeInSecs);
+            participant.getAction().reduceRemainingDurationInSecs(UPDATE_STEP_SIZE_SEC);
         }
 
-        this.timeInSecs += timeInSecs;
+        this.timeInSecs += UPDATE_STEP_SIZE_SEC;
 
         // for testing
         System.out.println("game time is now: " + this.timeInSecs);
+
+        generateEvents();
+    }
+
+    private void updateUI() {
+        // TODO Auto-generated method stub
+
     }
 
     /**
      * look at the current state of the world and determine whether certain
-     * events should take place, thus changing the state
+     * events should take place, thus changing the world state
      */
     private void generateEvents() {
         // =====================================================================================
@@ -102,8 +188,10 @@ public class Game {
         // =====================================================================================
     }
 
-    // go through the Sentient list, find the one has time remaining equal to zero and let them make decisions
-    // does not advance time
+    /**
+     *  go through the Sentient list, find the one has time remaining equal to zero and let them make decisions
+     *  Does not advance time.
+     */
     private void makeDecisions() {
         if (gameParticipants.isEmpty()) {
             return;
@@ -228,6 +316,43 @@ public class Game {
         Game game = new Game();
         game.constructMap();
         game.populateMap(5, 5);
-        game.run();
+        game.runGame();
     }
+
+    /**
+     * Stores data on how fast the game is running and some other timing
+     * configuration
+     *
+     * Only use the methods to edit your speed configuration, but you may access
+     * configuration values by evaluating the variables directly.
+     */
+    class SpeedConfig {
+        int targetFPS;
+        long nsBetweenFrames;
+
+        /**
+         * Ratio of game time to update vs. real time passed; defines game speed
+         * e.g. a ratio of 10.0 means the game time should advance 10 minutes
+         * every minute (the game is 10 times as fast as real life)
+         *
+         * Note that this game speed may not be met if your machine is slow...
+         */
+        double gameSpeedRatio;
+
+        SpeedConfig(int targetFPS, double gameSpeedRatio) {
+            setTargetFPS(targetFPS);
+            setGameSpeedRatio(gameSpeedRatio);
+        }
+
+        public void setTargetFPS(int targetFPS) {
+            this.targetFPS = targetFPS;
+            nsBetweenFrames = 1000000000 / targetFPS;
+        }
+
+        public void setGameSpeedRatio(double gameSpeedRatio) {
+            this.gameSpeedRatio = gameSpeedRatio;
+        }
+
+    }
+
 }
