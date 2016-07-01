@@ -16,6 +16,10 @@ public interface Sentient {
      */
     void makeDecision();
 
+    void ResolveAction();
+
+    void SetEncounterTarget();
+
     Action getAction();
 
     /**

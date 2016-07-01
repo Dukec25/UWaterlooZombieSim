@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Game {
+    // method declaration
+    private void runGame();
+
+
     /////////////////////////////////////////////////////////
     // Game level constants
     final int UPDATE_STEP_SIZE_SEC = 60; // how much game time each
@@ -131,8 +135,15 @@ public class Game {
     private void updateStateOneStep() {
         makeDecisions();
 
-        // update remaining times (TODO: implement how to update state!)
+        // update remaining times (TODO: implement how to update state!g
+        // also clear out inactive group
+
+        // TODO: implement gameover mechanism
         for (Sentient participant : gameParticipants) {
+            if ( participant.GetStatus() )
+            {
+                gameParticipants.remove(participant);
+            }
             participant.getAction().reduceRemainingDurationInSecs(UPDATE_STEP_SIZE_SEC);
         }
 
@@ -199,6 +210,8 @@ public class Game {
 
         while (0 == gameParticipants.peek().getAction().getRemainingDurationInSecs()) {
             Sentient temp = gameParticipants.poll();
+            determineResult(); // TODO, preferably to be a method of Game Class, skip if action is ENCOUNTERING
+            temp.ResolveAction(); // under development
             temp.makeDecision();
             gameParticipants.add(temp);
         }
