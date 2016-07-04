@@ -1,5 +1,6 @@
 package uwaterloo.student.zombie.crazy.domain;
 
+import java.util.List;
 import java.util.Random;
 
 public class GameUtil
@@ -29,6 +30,35 @@ public class GameUtil
         } else {
             return true;
         }
+    }
+
+    /**
+     * Receives a list of non-negative weights representing probability and
+     * returns the index of the randomly chosen weight.
+     * @param weights list of weights representing probability
+     * @return the index of the randomly chosen weight; or -1 if
+     */
+    public static int randomlyChooseByWeight(List<Integer> weights)
+    {
+        if (weights.isEmpty()) { return -1; }
+
+        // sanity-checking
+        if (!weights.stream().allMatch(integer -> integer >= 0))
+        {
+            throw new IllegalArgumentException("randomlyChooseByWeight() received negative weight!");
+        }
+
+        int weightSum = weights.stream().mapToInt(Integer::intValue).sum();
+        final int decisionPosition = GameUtil.nextInt(weightSum) + 1;
+
+        int decisionPositionRemaining = decisionPosition;
+        int i = 0;
+        while (decisionPositionRemaining > weights.get(i))
+        {
+            decisionPositionRemaining -= weights.get(i);
+            i++;
+        }
+        return i;
     }
 
     /**
