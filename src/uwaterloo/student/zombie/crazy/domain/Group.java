@@ -1,6 +1,10 @@
 package uwaterloo.student.zombie.crazy.domain;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import uwaterloo.student.zombie.crazy.domain.Action.ActionType;
 
 public class Group implements Sentient
 {
@@ -43,9 +47,26 @@ public class Group implements Sentient
 	@Override
     public void makeDecision()
     {
-		// TODO Auto-generated method stub
+        if (members.isEmpty()) { return; }
 
-	}
+        List<Incentive.ActionWeightPair> actionWeightPairs  = members.stream()
+                .flatMap(m -> m.incentives.stream())
+                .flatMap(incentive -> incentive.getActionWeightPairs().stream())
+                .collect(Collectors.toList());
+        List<Integer> weights = actionWeightPairs.stream()
+                .mapToInt(pair -> pair.weight)
+                .boxed()
+                .collect(Collectors.toList());
+        final int chosenActionIdx = GameUtil.randomlyChooseByWeight(weights);
+
+        ActionType chosenActionType = actionWeightPairs.get(chosenActionIdx)
+                .getActionType();
+        // TODO: figure out how to determine length of action later
+        final long DEFAULT_ACTION_DURATION_SECS = 60 * 60;
+        Action action = new Action(chosenActionType, DEFAULT_ACTION_DURATION_SECS);
+
+        this.setAction(action);
+    }
 
     @Override
     public boolean getStatus()
