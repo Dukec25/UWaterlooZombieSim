@@ -32,21 +32,21 @@ public class Action {
 		this.remainingDurationInSecs = totalDurationInSecs;
 	}
 	
-    public boolean GetStatus() 
+    public boolean getStatus()
     {
         return actionStatus;
     }
     
-    public void SetStatus(boolean status)
+    public void setStatus(boolean status)
     {
         actionStatus = status;
     }
         
-	public ActionType GetType() {
+	public ActionType getType() {
 		return type;
 	}
 
-	public Structure GetDest() {
+	public Structure getDest() {
 		return dest;
 	}
 

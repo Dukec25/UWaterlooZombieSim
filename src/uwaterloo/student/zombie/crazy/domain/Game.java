@@ -11,10 +11,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Game {
-    // method declaration
-    private void runGame();
-
-
     /////////////////////////////////////////////////////////
     // Game level constants
     final int UPDATE_STEP_SIZE_SEC = 60; // how much game time each
@@ -140,7 +136,7 @@ public class Game {
 
         // TODO: implement gameover mechanism
         for (Sentient participant : gameParticipants) {
-            if ( participant.GetStatus() )
+            if ( participant.getStatus() )
             {
                 gameParticipants.remove(participant);
             }
@@ -179,16 +175,16 @@ public class Game {
 
                     if (GameUtil.chancePercentage(sentientI.getEncounterProbabiltyWith(sentientJ))) {
                         // update sentientI's state
-                        if (sentientI.getAction().getType() != Action.ActionType.ENCOUNTERED) {
+                        if (sentientI.getAction().getType() != Action.ActionType.ENCOUNTERING) {
                             sentientI.setAction(
-                                    new Action(Action.ActionType.ENCOUNTERED, Action.ENCOUNTER_DURATION_IN_SECS));
+                                    new Action(Action.ActionType.ENCOUNTERING, Action.ENCOUNTER_DURATION_IN_SECS));
                         }
                         sentientI.getAction().getEncounteredSentients().add(sentientJ);
 
                         // update sentientJ's state
-                        if (sentientJ.getAction().getType() != Action.ActionType.ENCOUNTERED) {
+                        if (sentientJ.getAction().getType() != Action.ActionType.ENCOUNTERING) {
                             sentientJ.setAction(
-                                    new Action(Action.ActionType.ENCOUNTERED, Action.ENCOUNTER_DURATION_IN_SECS));
+                                    new Action(Action.ActionType.ENCOUNTERING, Action.ENCOUNTER_DURATION_IN_SECS));
                         }
                         sentientJ.getAction().getEncounteredSentients().add(sentientI);
                     }
@@ -210,7 +206,7 @@ public class Game {
 
         while (0 == gameParticipants.peek().getAction().getRemainingDurationInSecs()) {
             Sentient temp = gameParticipants.poll();
-            determineResult(); // TODO, preferably to be a method of Game Class, skip if action is ENCOUNTERING
+           // determineResult();  TODO, preferably to be a method of Game Class, skip if action is ENCOUNTERING
             temp.ResolveAction(); // under development
             temp.makeDecision();
             gameParticipants.add(temp);
