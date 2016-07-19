@@ -131,15 +131,13 @@ public class Game {
     private void updateStateOneStep() {
         makeDecisions();
 
-        // update remaining times (TODO: implement how to update state!g
-        // also clear out inactive group
+        resolveAction(); // will update state, under development
 
-        // TODO: implement gameover mechanism
-        for (Sentient participant : gameParticipants) {
-            if ( participant.getStatus() )
-            {
-                gameParticipants.remove(participant);
-            }
+        //TODO remove game participants when inactive
+
+        // update remaining times
+        for (Sentient participant : gameParticipants)
+        {
             participant.getAction().reduceRemainingDurationInSecs(UPDATE_STEP_SIZE_SEC);
         }
 
@@ -206,13 +204,24 @@ public class Game {
 
         while (0 == gameParticipants.peek().getAction().getRemainingDurationInSecs()) {
             Sentient temp = gameParticipants.poll();
-           // determineResult();  TODO, preferably to be a method of Game Class, skip if action is ENCOUNTERING
-            temp.ResolveAction(); // under development
             temp.makeDecision();
             gameParticipants.add(temp);
         }
     }
 
+    private void resolveAction() {
+        if (gameParticipants.isEmpty()) {
+            return;
+        }
+
+        for (Sentient participant : gameParticipants) 
+        {
+            if (participant.getAction().getRemainingDurationInSecs() == 0)
+            {
+                participant.ResolveAction();
+            }
+        }
+    }
     private void constructMap() throws IOException {
         String mapFileName = "res/UW_Map.txt"; // TODO: figure out where to put
                                                // this file

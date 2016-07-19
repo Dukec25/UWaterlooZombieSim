@@ -19,7 +19,7 @@ public class Group implements Sentient
     //TODO Inventory class
     //TODO Group Name
 
-    public void SetEncounterTarget(Group group)
+    public void setEncounterTarget(Group group)
     {
         this.target = group;
     }
@@ -99,7 +99,7 @@ public class Group implements Sentient
 
 	@Override
 	public Action getAction()
-    {
+        {
 		return action;
 	}
 
