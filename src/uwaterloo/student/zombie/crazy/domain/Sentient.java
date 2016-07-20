@@ -16,6 +16,8 @@ public interface Sentient {
      */
     void makeDecision();
 
+    void ResolveAction();
+
     Action getAction();
 
     /**
@@ -27,6 +29,7 @@ public interface Sentient {
     Structure getLocation();
 
     void setLocation(Structure location);
+
 
     /**
      * get the probability (in percentage per min) that this Sentient encounters
@@ -40,6 +43,7 @@ public interface Sentient {
     float getEncounterProbabiltyWith(Sentient other);
 
     void advanceStateForTime(int secs);
-    
+
+    boolean  getStatus();
     String getName();
 }

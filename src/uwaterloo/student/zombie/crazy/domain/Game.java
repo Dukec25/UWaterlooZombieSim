@@ -131,8 +131,13 @@ public class Game {
     private void updateStateOneStep() {
         makeDecisions();
 
-        // update remaining times (TODO: implement how to update state!)
-        for (Sentient participant : gameParticipants) {
+        resolveAction(); // will update state, under development
+
+        //TODO remove game participants when inactive
+
+        // update remaining times
+        for (Sentient participant : gameParticipants)
+        {
             participant.getAction().reduceRemainingDurationInSecs(UPDATE_STEP_SIZE_SEC);
         }
 
@@ -168,16 +173,16 @@ public class Game {
 
                     if (GameUtil.chancePercentage(sentientI.getEncounterProbabiltyWith(sentientJ))) {
                         // update sentientI's state
-                        if (sentientI.getAction().getType() != Action.ActionType.ENCOUNTERED) {
+                        if (sentientI.getAction().getType() != Action.ActionType.ENCOUNTERING) {
                             sentientI.setAction(
-                                    new Action(Action.ActionType.ENCOUNTERED, Action.ENCOUNTER_DURATION_IN_SECS));
+                                    new Action(Action.ActionType.ENCOUNTERING, Action.ENCOUNTER_DURATION_IN_SECS));
                         }
                         sentientI.getAction().getEncounteredSentients().add(sentientJ);
 
                         // update sentientJ's state
-                        if (sentientJ.getAction().getType() != Action.ActionType.ENCOUNTERED) {
+                        if (sentientJ.getAction().getType() != Action.ActionType.ENCOUNTERING) {
                             sentientJ.setAction(
-                                    new Action(Action.ActionType.ENCOUNTERED, Action.ENCOUNTER_DURATION_IN_SECS));
+                                    new Action(Action.ActionType.ENCOUNTERING, Action.ENCOUNTER_DURATION_IN_SECS));
                         }
                         sentientJ.getAction().getEncounteredSentients().add(sentientI);
                     }
@@ -204,6 +209,19 @@ public class Game {
         }
     }
 
+    private void resolveAction() {
+        if (gameParticipants.isEmpty()) {
+            return;
+        }
+
+        for (Sentient participant : gameParticipants) 
+        {
+            if (participant.getAction().getRemainingDurationInSecs() == 0)
+            {
+                participant.ResolveAction();
+            }
+        }
+    }
     private void constructMap() throws IOException {
         String mapFileName = "res/UW_Map.txt"; // TODO: figure out where to put
                                                // this file

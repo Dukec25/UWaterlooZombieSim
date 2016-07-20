@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Action {
+
 	public enum ActionType {
 	    MOVING, // moving to a new location
 	    EXPLORING, // exploring current location
 	    IDLE,
-	    ENCOUNTERED,
+	    ENCOUNTERING,
 	    FIGHTING,
-	    RUNNING 
+	    RUNNING
 	}
-	
+
 	final ActionType type;
 	final long totalDurationInSecs; // how much time is required to complete the action from start to finish
 	long remainingDurationInSecs; // how much more time is needed to complete the action
+    boolean actionStatus = false; // for now, true means success, false means failure
 	
 	// extra data (usually that go with specific action types) that doesn't necessarily need to be populated
 	Structure dest = null;
@@ -30,6 +32,16 @@ public class Action {
 		this.remainingDurationInSecs = totalDurationInSecs;
 	}
 	
+    public boolean getStatus()
+    {
+        return actionStatus;
+    }
+    
+    public void setStatus(boolean status)
+    {
+        actionStatus = status;
+    }
+        
 	public ActionType getType() {
 		return type;
 	}
