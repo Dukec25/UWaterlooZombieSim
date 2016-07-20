@@ -8,12 +8,12 @@ import uwaterloo.student.zombie.crazy.domain.Action.ActionType;
 
 public class Group implements Sentient
 {
-	// constants:
-	private static final float ENCOUNTER_PROB = (float) 1.0; // in percentage per minute
+    // constants:
+    private static final float ENCOUNTER_PROB = (float) 1.0; // in percentage per minute
 
-	Action action;
-	ArrayList<Creature> members = new ArrayList<Creature>();
-	Structure location;
+    Action action;
+    ArrayList<Creature> members = new ArrayList<Creature>();
+    Structure location;
     Group target;
 
     // for now, true means group is active, false means group no longer exist,
@@ -30,21 +30,21 @@ public class Group implements Sentient
 
     public void addMember(Creature creature)
     {
-		if( !members.isEmpty()){
-			if( (creature instanceof Human && members.get(0) instanceof Zombie)
-					|| (creature instanceof Zombie && members.get(0) instanceof Human) ){
-				throw new RuntimeException("incompatible type");
-			}
-		}
-		members.add(creature);
-	}
+        if( !members.isEmpty()){
+            if( (creature instanceof Human && members.get(0) instanceof Zombie)
+                    || (creature instanceof Zombie && members.get(0) instanceof Human) ){
+                throw new RuntimeException("incompatible type");
+            }
+        }
+        members.add(creature);
+    }
 
     public void removeMember(Creature creature)
     {
-		members.remove(creature);
-	}
+        members.remove(creature);
+    }
 
-	@Override
+    @Override
     public void makeDecision()
     {
         if (members.isEmpty()) { return; }
@@ -118,35 +118,35 @@ public class Group implements Sentient
         }
     }
 
-	@Override
-	public Action getAction()
+    @Override
+    public Action getAction()
         {
-		return action;
-	}
+        return action;
+    }
 
-	@Override
-	public float getEncounterProbabiltyWith(Sentient other)
+    @Override
+    public float getEncounterProbabiltyWith(Sentient other)
     {
-		return ENCOUNTER_PROB;
-	}
+        return ENCOUNTER_PROB;
+    }
 
-	@Override
-	public void setAction(Action action)
+    @Override
+    public void setAction(Action action)
     {
-		this.action = action;
-	}
+        this.action = action;
+    }
 
-	@Override
-	public Structure getLocation()
+    @Override
+    public Structure getLocation()
     {
-		return location;
-	}
+        return location;
+    }
 
-	@Override
-	public void setLocation(Structure location)
+    @Override
+    public void setLocation(Structure location)
     {
-		this.location = location;
-	}
+        this.location = location;
+    }
 
     @Override
     public String getName()

@@ -5,32 +5,32 @@ import java.util.List;
 
 public class Action {
 
-	public enum ActionType {
-	    MOVING, // moving to a new location
-	    EXPLORING, // exploring current location
-	    IDLE,
-	    ENCOUNTERING,
-	    FIGHTING,
-	    RUNNING
-	}
+    public enum ActionType {
+        MOVING, // moving to a new location
+        EXPLORING, // exploring current location
+        IDLE,
+        ENCOUNTERING,
+        FIGHTING,
+        RUNNING
+    }
 
-	final ActionType type;
-	final long totalDurationInSecs; // how much time is required to complete the action from start to finish
-	long remainingDurationInSecs; // how much more time is needed to complete the action
+    final ActionType type;
+    final long totalDurationInSecs; // how much time is required to complete the action from start to finish
+    long remainingDurationInSecs; // how much more time is needed to complete the action
     boolean actionStatus = false; // for now, true means success, false means failure
 
-	// extra data (usually that go with specific action types) that doesn't necessarily need to be populated
-	Structure dest = null;
-	List<Sentient> encounteredSentients = new ArrayList<Sentient>();
+    // extra data (usually that go with specific action types) that doesn't necessarily need to be populated
+    Structure dest = null;
+    List<Sentient> encounteredSentients = new ArrayList<Sentient>();
 
-	// constants:
-	public static final int ENCOUNTER_DURATION_IN_SECS = 60;
+    // constants:
+    public static final int ENCOUNTER_DURATION_IN_SECS = 60;
 
-	Action(ActionType type, long totalDurationInSecs){
-		this.type = type;
-		this.totalDurationInSecs = totalDurationInSecs;
-		this.remainingDurationInSecs = totalDurationInSecs;
-	}
+    Action(ActionType type, long totalDurationInSecs){
+        this.type = type;
+        this.totalDurationInSecs = totalDurationInSecs;
+        this.remainingDurationInSecs = totalDurationInSecs;
+    }
 
     public boolean getStatus()
     {
@@ -42,9 +42,9 @@ public class Action {
         actionStatus = status;
     }
 
-	public ActionType getType() {
-		return type;
-	}
+    public ActionType getType() {
+        return type;
+    }
 
     public Structure getDest()
     {
