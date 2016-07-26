@@ -1,7 +1,8 @@
 package uwaterloo.student.zombie.crazy.domain;
 
 public class Creature {
-	int hp;
-	int speed;
-	int strength;
+	int m_hp;
+	int m_speed;
+	int m_strength;
+        CreatureInventory m_inventory; 
 }
