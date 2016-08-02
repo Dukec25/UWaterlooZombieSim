@@ -11,6 +11,7 @@ public class Action {
         IDLE,
         ENCOUNTERING,
         FIGHTING,
+        EATING,
         RUNNING
     }
 

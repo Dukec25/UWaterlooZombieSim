@@ -61,7 +61,7 @@ public class Incentive
      * Plain old data type representing incentive for exactly one specific action
      *
      */
-    public class ActionWeightPair
+    public static class ActionWeightPair
     {
         // TODO: actionType is really generic, eventually, we should have
         // incentives for more specific actions like "move to XYZ" rather than just "move".
