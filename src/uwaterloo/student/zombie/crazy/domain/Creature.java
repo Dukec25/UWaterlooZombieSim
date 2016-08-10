@@ -30,7 +30,16 @@ public class Creature
             List<ActionWeightPair> awpairs = new ArrayList<ActionWeightPair>();
             awpairs.add(new ActionWeightPair(ActionType.EATING, hunger * 2));
             awpairs.add(new ActionWeightPair(ActionType.EXPLORING, hunger));
-            Incentive hungerIncentive = new Incentive(awpairs, "Hunger drives this individual.");
+            Incentive hungerIncentive = new Incentive(awpairs, "motivated by hunger");
+            incentives.add(hungerIncentive);
+        }
+
+        {
+            int curiosity = 10; // TODO: making this hardcoded for now
+            List<ActionWeightPair> awpairs = new ArrayList<ActionWeightPair>();
+            awpairs.add(new ActionWeightPair(ActionType.EXPLORING, curiosity * 2));
+            awpairs.add(new ActionWeightPair(ActionType.MOVING, curiosity));
+            Incentive hungerIncentive = new Incentive(awpairs, "driven by curiosity");
             incentives.add(hungerIncentive);
         }
     }
